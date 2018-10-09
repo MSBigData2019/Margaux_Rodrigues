@@ -26,7 +26,7 @@ def get_quarter_results(soup):
     col_mean      = 2
     resultsLine   = financials_table.findAll("tr", {"class" : "stripe"})
     quarterResult = resultsLine[quarter_line].findAll("td", {"class" : "data"})
-    return quarterResult[2].text.strip()
+    return quarterResult[col_mean].text.strip()
 
 # B. Prix de l'action et sa dernière variation
 def get_share_price(soup):
@@ -36,7 +36,6 @@ def get_share_price(soup):
 
 def get_share_percentage_var(soup):
     quote_details = soup.findAll("div", {"class" : "sectionQuoteDetail"})
-    share_price  = quote_details[0].findAll("span")[1]
     price_change = quote_details[1].find("span", {"class" : "valueContentPercent"})
     return price_change.text.strip()
 
@@ -57,14 +56,16 @@ def get_dividends(soup):
     
 # 0. Read pages
 
-
-url = "https://www.reuters.com/finance/stocks/financial-highlights/LVMH.PA"
-page = urlopen(url).read()
-soup = BeautifulSoup(page, 'lxml')
-print('Quarter Dec 1 result : \n' + get_quarter_results(soup))
-print('Share price : \n' + get_share_price(soup))
-print('Price change percentage :\n' + get_share_percentage_var(soup))
-print('Pourcentage de détention institutionnel :\n' + get_instit_part(soup))
-print('Dividende de la société : \n' + get_dividends(soup)[0] + \
-      '\nDividende du secteur : \n' + get_dividends(soup)[1] + \
-      '\nDividende de l\'industrie : \n' + get_dividends(soup)[2] )
+companies = ['LVMH.PA', 'AIR.PA', 'DANO.PA']
+for i in range(len(companies)):
+    url = "https://www.reuters.com/finance/stocks/financial-highlights/" + companies[i]
+    print(companies[i])
+    page = urlopen(url).read()
+    soup = BeautifulSoup(page, 'lxml')
+    print('Quarter Dec 1 result : \n' + get_quarter_results(soup))
+    print('Share price : \n' + get_share_price(soup))
+    print('Price change percentage :\n' + get_share_percentage_var(soup))
+    print('Pourcentage de détention institutionnel :\n' + get_instit_part(soup))
+    print('Dividende de la société : \n' + get_dividends(soup)[0] + \
+          '\nDividende du secteur : \n' + get_dividends(soup)[1] + \
+          '\nDividende de l\'industrie : \n' + get_dividends(soup)[2] )
