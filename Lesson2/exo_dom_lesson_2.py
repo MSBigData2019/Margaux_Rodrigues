@@ -15,37 +15,56 @@ from urllib.request import urlopen
 # le % Shares Owned des investisseurs institutionels
 # le dividend yield de la company, le secteur et de l'industrie
 
-# 0. Read page
+    
+# A. Ventes du dernier quarter
+def get_quarter_results(soup):
+    """
+    Read and return last quarter result available in string format
+    """
+    financials_table = soup.find("table", {"class": "dataTable"})
+    quarter_line  = 0
+    col_mean      = 2
+    resultsLine   = financials_table.findAll("tr", {"class" : "stripe"})
+    quarterResult = resultsLine[quarter_line].findAll("td", {"class" : "data"})
+    return quarterResult[2].text.strip()
+
+# B. Prix de l'action et sa dernière variation
+def get_share_price(soup):
+    quote_details = soup.findAll("div", {"class" : "sectionQuoteDetail"})
+    share_price  = quote_details[0].findAll("span")[1]
+    return share_price.text.strip()
+
+def get_share_percentage_var(soup):
+    quote_details = soup.findAll("div", {"class" : "sectionQuoteDetail"})
+    share_price  = quote_details[0].findAll("span")[1]
+    price_change = quote_details[1].find("span", {"class" : "valueContentPercent"})
+    return price_change.text.strip()
+
+# C. Pourcentage de parts détenues par des institutionnels
+def get_instit_part(soup):
+    small_table = soup.findAll("div", {'class':'moduleHeader'})
+    ownership_instit = small_table[12].findNext('td', {'class':'data'})
+    return ownership_instit.text.strip()
+
+# D. Didivend yield de la société, du secteur et de l'industrie
+def get_dividends(soup):
+    small_table = soup.findAll("div", {'class':'moduleHeader'})
+    dividend_table    = small_table[3].findAllNext('td', {'class':'data'})
+    company_dividend  = dividend_table[0].text.strip()
+    sector_dividend   = dividend_table[1].text.strip()
+    industry_dividend = dividend_table[2].text.strip()
+    return [company_dividend, sector_dividend, industry_dividend]
+    
+# 0. Read pages
+
+
 url = "https://www.reuters.com/finance/stocks/financial-highlights/LVMH.PA"
 page = urlopen(url).read()
 soup = BeautifulSoup(page, 'lxml')
-
-# A. Ventes du dernier quarter
-financials_table = soup.find("table", {"class": "dataTable"})
-quarter_line  = 0
-col_mean      = 2
-resultsLine   = financials_table.findAll("tr", {"class" : "stripe"})
-quarterResult = resultsLine[quarter_line].findAll("td", {"class" : "data"})
-# Résultat final !
-print('Quarter Dec 1 result : \n' + quarterResult[2].text.strip())
-
-# B. Prix de l'action et sa dernière variation
-quote_details = soup.findAll("div", {"class" : "sectionQuoteDetail"})
-share_price  = quote_details[0].findAll("span")[1]
-print('Share price : \n' + share_price.text.strip())
-price_change = quote_details[1].find("span", {"class" : "valueContentPercent"})
-print('Price change percentage :\n' + price_change.text.strip())
-
-# C. Pourcentage de parts détenues par des institutionnels
-small_table = soup.findAll("div", {'class':'moduleHeader'})
-ownership_instit = small_table[12].findNext('td', {'class':'data'})
-print(ownership_instit.text)
-
-# D. Didivend yield de la société, du secteur et de l'industrie
-dividend_table    = small_table[3].findAllNext('td', {'class':'data'})
-company_dividend  = dividend_table[0]
-sector_dividend   = dividend_table[1]
-industry_dividend = dividend_table[2]
-print('Dividende de la société : \n' + company_dividend.text + \
-      '\nDividende du secteur : \n' + sector_dividend.text + \
-      '\nDividende de l\'industrie : \n' + industry_dividend.text)
+print('Quarter Dec 1 result : \n' + get_quarter_results(soup))
+print('Share price : \n' + get_share_price(soup))
+print('Price change percentage :\n' + get_share_percentage_var(soup))
+print('Pourcentage de détention institutionnel :\n' + get_instit_part(soup))
+print('Dividende de la société : \n' + get_dividends(soup)[0] + \
+      '\nDividende du secteur : \n' + get_dividends(soup)[1] + \
+      '\nDividende de l\'industrie : \n' + get_dividends(soup)[2] )
