@@ -33,7 +33,7 @@ def get_quarter_results(soup):
 # B. Prix de l'action et sa dernière variation
 def get_share_price(soup):
     """
-    Read and return share price of the stock
+    Read and return share price of the stock as string
     """
     quote_details = soup.find("span", {"class" : "nasdaqChangeHeader"})
     share_price  = quote_details.findNext("span")
@@ -41,7 +41,7 @@ def get_share_price(soup):
 
 def get_share_percentage_var(soup):
     """
-    Read and return the percentage change of share price
+    Read and return the percentage change of share price as string
     """
     quote_details = soup.find("div", {"class" : "sectionQuote priceChange"})
     price_change = quote_details.find("span", {"class" : "valueContentPercent"})
@@ -50,7 +50,7 @@ def get_share_percentage_var(soup):
 # C. Pourcentage de parts détenues par des institutionnels
 def get_instit_part(soup):
     """
-    Read and return percentage of institutional ownership
+    Read and return percentage of institutional ownership (as string)
     """
     small_table = soup.findAll("div", {'class':'moduleHeader'})
     # Look for insitutional table
@@ -62,7 +62,7 @@ def get_instit_part(soup):
 # D. Didivend yield de la société, du secteur et de l'industrie
 def get_dividends(soup):
     """
-    Read and return the dividend yield as a table [company, sector, industry]
+    Read and return the dividend yield as a string table [company, sector, industry]
     """
     small_table = soup.findAll("div", {'class':'moduleHeader'})
     dividend_table    = small_table[3].findAllNext('td', {'class':'data'})
@@ -82,7 +82,7 @@ for i in range(len(companies)):
     print('Quarter Dec 1 result : \n' + get_quarter_results(soup))
     print('Share price : \n' + get_share_price(soup))
     print('Price change percentage :\n' + get_share_percentage_var(soup))
-    print('Pourcentage de détention institutionnel :\n' + get_instit_part(soup))
-    print('Dividende de la société : \n' + get_dividends(soup)[0] + \
-          '\nDividende du secteur : \n' + get_dividends(soup)[1] + \
-          '\nDividende de l\'industrie : \n' + get_dividends(soup)[2] )
+    print('Insitutional ownership detention percentage :\n' + get_instit_part(soup))
+    print('Diviend yield of the company : \n' + get_dividends(soup)[0] + \
+          '\nDividend yield sector: \n' + get_dividends(soup)[1] + \
+          '\nDividend yield industry : \n' + get_dividends(soup)[2] )
