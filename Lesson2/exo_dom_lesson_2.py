@@ -19,34 +19,51 @@ from urllib.request import urlopen
 # A. Ventes du dernier quarter
 def get_quarter_results(soup):
     """
-    Read and return last quarter result available in string format
+    Read and return the quarter results estimate (mean) for December 2018 in string format
     """
-    financials_table = soup.find("table", {"class": "dataTable"})
-    quarter_line  = 0
-    col_mean      = 2
-    resultsLine   = financials_table.findAll("tr", {"class" : "stripe"})
-    quarterResult = resultsLine[quarter_line].findAll("td", {"class" : "data"})
-    return quarterResult[col_mean].text.strip()
+    financials_table = soup.findAll("td", {"class": "dataTitle"})
+    for i in range(len(financials_table)):
+        if 'SALES' in financials_table[i].text.strip():
+            items_financials = financials_table[i].findAllNext("td")
+            for i in range(len(items_financials)):
+                if ('Quarter' in items_financials[i].text) &  ('Dec-18' in items_financials[i].text):
+                    quarterResult = items_financials[i].findAllNext("td", {"class" : "data"})
+                    return quarterResult[1].text.strip()
 
 # B. Prix de l'action et sa dernière variation
 def get_share_price(soup):
-    quote_details = soup.findAll("div", {"class" : "sectionQuoteDetail"})
-    share_price  = quote_details[0].findAll("span")[1]
+    """
+    Read and return share price of the stock
+    """
+    quote_details = soup.find("span", {"class" : "nasdaqChangeHeader"})
+    share_price  = quote_details.findNext("span")
     return share_price.text.strip()
 
 def get_share_percentage_var(soup):
-    quote_details = soup.findAll("div", {"class" : "sectionQuoteDetail"})
-    price_change = quote_details[1].find("span", {"class" : "valueContentPercent"})
+    """
+    Read and return the percentage change of share price
+    """
+    quote_details = soup.find("div", {"class" : "sectionQuote priceChange"})
+    price_change = quote_details.find("span", {"class" : "valueContentPercent"})
     return price_change.text.strip()
 
 # C. Pourcentage de parts détenues par des institutionnels
 def get_instit_part(soup):
+    """
+    Read and return percentage of institutional ownership
+    """
     small_table = soup.findAll("div", {'class':'moduleHeader'})
-    ownership_instit = small_table[12].findNext('td', {'class':'data'})
+    # Look for insitutional table
+    for i in range(len(small_table)):
+        if 'Institutional' in small_table[i].h3.text.strip():
+           ownership_instit  = small_table[i].findNext('td', {'class':'data'})
     return ownership_instit.text.strip()
 
 # D. Didivend yield de la société, du secteur et de l'industrie
 def get_dividends(soup):
+    """
+    Read and return the dividend yield as a table [company, sector, industry]
+    """
     small_table = soup.findAll("div", {'class':'moduleHeader'})
     dividend_table    = small_table[3].findAllNext('td', {'class':'data'})
     company_dividend  = dividend_table[0].text.strip()
