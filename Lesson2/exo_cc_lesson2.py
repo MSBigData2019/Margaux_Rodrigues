@@ -5,7 +5,7 @@
 Ceci est un script temporaire.
 """
 
-# Dell ou Acer les plus soldés sur rue du commerce ?
+# Dell ou Acer les plus soldés sur rue du commerce / Darty ?
 from bs4 import BeautifulSoup
 from urllib.request import urlopen, Request
 
