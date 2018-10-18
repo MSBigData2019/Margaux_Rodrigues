@@ -8,6 +8,7 @@ Created on Thu Oct 18 14:51:35 2018
 from bs4 import BeautifulSoup
 import requests
 import pandas as pd
+import json
 
 def get_main_contrib_crawl(url):
     
@@ -40,8 +41,17 @@ def get_main_contrib_crawl(url):
         
 
 def main():
+    # Crawling
     url = 'https://gist.github.com/paulmillr/2657075'
-    get_main_contrib_crawl(url)
-
+    # get_main_contrib_crawl(url)
+    # using API
+    # objectif récupérer pour les top contributeurs le nombre moyen de stars de leurs repos
+    # puis les classer 
+    url = 'https://api.github.com/users/StephanePEILLET/repos'
+    head = {'Authorization': 'token {}'.format('token')}
+    get_repo = requests.get(url, headers=head)
+    truc = json.loads(get_repo.content)
+    print(truc)
+    #stragazers_count
 if __name__ == '__main__':
     main()
