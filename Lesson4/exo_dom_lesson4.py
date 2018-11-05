@@ -22,6 +22,9 @@ import pandas as pd
 import re
 
 def soup_request(url):
+    '''
+    Makes soup from url if requests succeeds
+    '''
     req = requests.get(url, headers = {'User-Agent': 'Mozilla/5.0'})
     if req.status_code != 200:
         print('Echec de la requête')
@@ -31,6 +34,9 @@ def soup_request(url):
 
 # get price
 def get_car_price_from_soup(soup):
+    '''
+    From a specific page retrieves car price
+    '''
     a = soup.find('div', {'class':'gpfzj'})
     price = str(a.find_next('strong').text)
     price_regex = re.compile(r"\d+\s+\d+")
@@ -40,16 +46,25 @@ def get_car_price_from_soup(soup):
 
 # Autres infos
 def get_year_from_soup(soup):
+    '''
+    From a specific page retrieves year of the car
+    '''
     infos_generales = soup_annonce.find('ul', {'class' : 'infoGeneraleTxt column2'})
     return int(infos_generales.findNext('span').text)
 
 def get_mileage_from_soup(soup):
+    '''
+    From a specific page retireves mileage of the car
+    '''
     infos_generales = soup_annonce.find('ul', {'class' : 'infoGeneraleTxt column2'})
     kilometrage = infos_generales.findNext('span').findNext('span').text
     kilometrage = re.sub(r"\s+|[a-z]", "", kilometrage)
     return int(kilometrage)
 
 def add_ad_to_data(soup, ad_number, data):
+    '''
+    Adds information retrieved from ad page to a dataframe data
+    '''
     data['ad_number'].append(ad_number)
     data['price, km, year'].append([get_car_price_from_soup(soup), get_mileage_from_soup(soup), get_year_from_soup(soup)])
 # -------------------------------------------
@@ -82,3 +97,6 @@ for i in range(len(links)):
 # create dataframe with results
 df = pd.DataFrame(cars_renault_zoe)
 df2 = pd.DataFrame(df['price, km, year'].values.tolist(), columns=['Price', 'Km', 'Year'])
+
+# TODO
+# Scroll all pages
